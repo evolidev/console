@@ -15,7 +15,7 @@ Don't settle for a bland and boring command line interface. Choose evolidev/cons
 ## Examples
 
 A very simple exmaple that demostrates how the console plugin can be used.
-```
+```go
 package main
 
 import (
