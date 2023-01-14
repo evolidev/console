@@ -37,3 +37,25 @@ func main() {
 }
 
 ```
+
+## Functions
+
+### AddCommand
+
+The `AddCommand` method allows you to register a new command with the CLI router. The method takes in three arguments:
+
+1. "name": This is the name of the command that will be used to invoke the command in the command line interface.
+2. "description": This is a brief description of the command's functionality. This description will be displayed to the user when they use the --help flag with the command.
+3. func(c *parse.ParsedCommand): This is the function that will be executed when the command is invoked. The function takes in a pointer to a ParsedCommand struct, which contains information about the command, such as its name, arguments, and flags.
+
+For example, to add a command named "greet" with a description "prints a greeting message" that takes a name argument and prints "Hello, [name]" when invoked, you can use the following code:
+
+```go
+command := cli.AddCommand("greet", "prints a greeting message", func(c *parse.ParsedCommand){
+    name := c.Args["name"].Value
+    fmt.Println("Hello, ", name)
+})
+command.AddArg("name", "The name of the person to greet")
+```
+
+The AddCommand method returns the command struct and you can use it to add arguments, flags and more. Keep in mind that once you have added your commands, you need to run the router to listen for commands.
