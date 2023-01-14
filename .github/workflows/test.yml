@@ -28,4 +28,5 @@ jobs:
         with:
           name: Go-results
           path: TestResults.json
+          retention-days: 7
 
