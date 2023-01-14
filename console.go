@@ -130,10 +130,6 @@ func Render(commands map[string]*Command) {
 
 	addCommandsToTable(commands, table)
 
-	fmt.Println(fmt.Sprintf(
-		"Evoli Console %s", color.Text(169, "0.0.1"),
-	))
-	fmt.Println()
 	table.Render()
 }
 
