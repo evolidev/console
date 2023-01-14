@@ -2,18 +2,19 @@ package console
 
 import (
 	"fmt"
-	"os"
+    "github.com/evolidev/console/parse"
+    "os"
 	"sort"
 	"strings"
 
-	"github.com/evolidev/evoli/framework/console/color"
+	"github.com/evolidev/console/color"
 	"github.com/olekukonko/tablewriter"
 )
 
 type Command struct {
 	Definition  string
 	Description string
-	Execution   func(c *ParsedCommand)
+	Execution   func(c *parse.ParsedCommand)
 }
 
 func (cmd *Command) GetName() string {
@@ -36,7 +37,7 @@ func (cmd *Command) GetDescription() string {
 	return cmd.Description
 }
 
-func (cmd *Command) Run(c *ParsedCommand) {
+func (cmd *Command) Run(c *parse.ParsedCommand) {
 	//return cmd.Name
 }
 
@@ -57,7 +58,7 @@ func (c *Console) Run() {
 	if len(args) > 0 {
 		command := args[0]
 		if cmd, ok := c.Commands[command]; ok {
-			parsed := Parse(cmd.Definition, strings.Join(args, " "))
+			parsed := parse.Parse(cmd.Definition, strings.Join(args, " "))
 			cmd.Execution(parsed)
 			return
 		} else {
@@ -72,7 +73,7 @@ func (c *Console) Add(command *Command) {
 	c.Commands[command.GetName()] = command
 }
 
-func (c *Console) AddCommand(name string, description string, execution func(c *ParsedCommand)) *Command {
+func (c *Console) AddCommand(name string, description string, execution func(c *parse.ParsedCommand)) *Command {
 	command := &Command{name, description, execution}
 	c.Add(command)
 

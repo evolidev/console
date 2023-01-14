@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/evolidev/evoli/framework/console/filenotify"
+	"github.com/evolidev/console/filenotify"
 )
 
 type Watcher struct {

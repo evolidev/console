@@ -1,8 +1,8 @@
-package test
+package console
 
 import (
-	"github.com/evolidev/evoli/framework/console"
-	"github.com/stretchr/testify/assert"
+    "github.com/evolidev/console/parse"
+    "github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -12,7 +12,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "mail:send foo"
 		definition := "mail:send {user}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, "foo", cmd.GetArgument("user").String())
 	})
@@ -21,7 +21,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "mail:send"
 		definition := "mail:send {user?}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, "", cmd.GetArgument("user").String())
 	})
@@ -30,7 +30,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "mail:send foo"
 		definition := "mail:send {user?}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, "foo", cmd.GetArgument("user").String())
 	})
@@ -39,7 +39,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "mail:send"
 		definition := "mail:send {user=foo}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, "foo", cmd.GetArgument("user").String())
 	})
@@ -48,7 +48,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "mail:send foo --queue"
 		definition := "mail:send {user} {--queue}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, true, cmd.GetOption("queue").Bool())
 	})
@@ -57,7 +57,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "serve"
 		definition := "serve {--port}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, 1010, cmd.GetOptionWithDefault("port", 1010).Integer())
 	})
@@ -66,7 +66,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "serve https"
 		definition := "serve {secure} {--port}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, "https", cmd.GetArgumentWithDefault("secure", "not-correct").String())
 	})
@@ -75,7 +75,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "serve"
 		definition := "serve {secure} {--port}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, "correct", cmd.GetArgumentWithDefault("secure", "correct").String())
 	})
@@ -84,7 +84,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "mail:send"
 		definition := "mail:send {user} {--queue=}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, "", cmd.GetOption("queue").String())
 	})
@@ -93,7 +93,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "mail:send -Q"
 		definition := "mail:send {user} {--Q|queue}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, true, cmd.GetOption("Q").Bool())
 	})
@@ -102,7 +102,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "mail:send"
 		definition := "mail:send {user} {--Q|queue}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, "mail:send", cmd.GetName())
 	})
@@ -111,7 +111,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "mail:send"
 		definition := "mail:send {user} {--Q|queue}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, "mail", cmd.GetPrefix())
 	})
@@ -120,7 +120,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "mail:send"
 		definition := "mail:send {user} {--Q|queue}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, "send", cmd.GetSubCommand())
 	})
@@ -129,7 +129,7 @@ func TestParseSimpleCommand(t *testing.T) {
 		command := "mail"
 		definition := "mail:send {user} {--Q|queue}"
 
-		cmd := console.Parse(definition, command)
+        cmd := parse.Parse(definition, command)
 
 		assert.Equal(t, "", cmd.GetSubCommand())
 	})

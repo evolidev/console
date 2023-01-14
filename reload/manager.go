@@ -2,8 +2,8 @@ package reload
 
 import (
 	"context"
-	"github.com/evolidev/evoli/framework/logging"
-	"github.com/evolidev/evoli/framework/use"
+	"github.com/evolidev/logging"
+	"github.com/evolidev/use"
 	"log"
 	"os/exec"
 	"strings"
