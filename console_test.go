@@ -1,10 +1,13 @@
 package console
 
 import (
+	"fmt"
+	"github.com/evolidev/console/color"
 	"github.com/evolidev/console/parse"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -280,4 +283,132 @@ func TestParseSimpleCommand(t *testing.T) {
 		assert.Contains(t, string(out), "queue:", "Expected 'mail:send' but got '%s'", string(out))
 	})
 
+}
+
+func TestText(t *testing.T) {
+	tests := []struct {
+		code    int
+		value   interface{}
+		want    string
+		hasAnsi bool
+	}{
+		{0, "hello", "\u001b[38;5;0mhello\u001b[0m", true},
+		{1, "world", "\u001b[38;5;1mworld\u001b[0m", true},
+		{255, "!", "\u001b[38;5;255m!\u001b[0m", true},
+	}
+
+	for _, test := range tests {
+		t.Run(fmt.Sprintf("%d-%v", test.code, test.value), func(t *testing.T) {
+			got := color.Text(test.code, test.value)
+			if got != test.want {
+				t.Errorf("Text(%d, %v) = %q, want %q", test.code, test.value, got, test.want)
+			}
+			if (len(got) > 4) != test.hasAnsi {
+				t.Errorf("Text(%d, %v) has ANSI = %t, want %t", test.code, test.value, len(got) > 4, test.hasAnsi)
+			}
+		})
+	}
+}
+
+func TestBg(t *testing.T) {
+	tests := []struct {
+		code    int
+		value   interface{}
+		want    string
+		hasAnsi bool
+	}{
+		{0, "hello", "\u001b[48;5;0mhello\u001b[0m", true},
+		{1, "world", "\u001b[48;5;1mworld\u001b[0m", true},
+		{255, "!", "\u001b[48;5;255m!\u001b[0m", true},
+	}
+
+	for _, test := range tests {
+		t.Run(fmt.Sprintf("%d-%v", test.code, test.value), func(t *testing.T) {
+			got := color.Bg(test.code, test.value)
+			if got != test.want {
+				t.Errorf("Bg(%d, %v) = %q, want %q", test.code, test.value, got, test.want)
+			}
+			if (len(got) > 4) != test.hasAnsi {
+				t.Errorf("Bg(%d, %v) has ANSI = %t, want %t", test.code, test.value, len(got) > 4, test.hasAnsi)
+			}
+		})
+	}
+}
+
+func TestGetOptionWithDefault(t *testing.T) {
+	tests := []struct {
+		name          string
+		parsedCommand parse.ParsedCommand
+		optionName    string
+		defaultValue  interface{}
+		expectedValue interface{}
+	}{
+		{
+			name: "Option exists",
+			parsedCommand: parse.ParsedCommand{
+				Options: map[string]interface{}{
+					"option1": "value1",
+				},
+			},
+			optionName:    "option1",
+			defaultValue:  "default1",
+			expectedValue: "value1",
+		},
+		{
+			name: "Option does not exist",
+			parsedCommand: parse.ParsedCommand{
+				Options: map[string]interface{}{},
+			},
+			optionName:    "option2",
+			defaultValue:  "default2",
+			expectedValue: "default2",
+		},
+		{
+			name: "Option exists but is empty",
+			parsedCommand: parse.ParsedCommand{
+				Options: map[string]interface{}{
+					"option3": "",
+				},
+			},
+			optionName:    "option3",
+			defaultValue:  "default3",
+			expectedValue: "default3",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			value := test.parsedCommand.GetOptionWithDefault(test.optionName, test.defaultValue)
+			if value.Value != test.expectedValue {
+				t.Errorf("Expected value %v, but got %v", test.expectedValue, value.Value)
+			}
+		})
+	}
+}
+
+func TestExtractField(t *testing.T) {
+	tests := []struct {
+		item    string
+		prefix  string
+		want    string
+		wantAny interface{}
+	}{
+		{"field=value", "--", "field", "value"},
+		{"field", "-", "field", true},
+		{"field=", "--", "field", true},
+		{"field=", "--", "field", true},
+		{"", "", "", true},
+	}
+
+	for _, test := range tests {
+		t.Run(test.item, func(t *testing.T) {
+			got, gotAny := parse.ExtractField(test.item, test.prefix)
+			if got != test.want {
+				t.Errorf("ExtractField(%q, %q) = %q, want %q", test.item, test.prefix, got, test.want)
+			}
+			if !reflect.DeepEqual(gotAny, test.wantAny) {
+				t.Errorf("ExtractField(%q, %q) = %v, want %v", test.item, test.prefix, gotAny, test.wantAny)
+			}
+		})
+	}
 }

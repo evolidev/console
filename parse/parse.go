@@ -8,12 +8,12 @@ import (
 )
 
 type ParsedCommand struct {
-	arguments  map[string]any
-	options    map[string]any
-	command    string
-	name       string
-	subCommand string
-	prefix     string
+	Arguments  map[string]any
+	Options    map[string]any
+	Command    string
+	Name       string
+	SubCommand string
+	Prefix     string
 }
 
 type Value struct {
@@ -34,7 +34,7 @@ func (o *Value) String() string {
 }
 
 func (p *ParsedCommand) HasOption(name string) bool {
-	if cmd, ok := p.options[name]; ok {
+	if cmd, ok := p.Options[name]; ok {
 		return cmd != nil
 	}
 
@@ -42,7 +42,7 @@ func (p *ParsedCommand) HasOption(name string) bool {
 }
 
 func (p *ParsedCommand) HasArgument(name string) bool {
-	if cmd, ok := p.arguments[name]; ok {
+	if cmd, ok := p.Arguments[name]; ok {
 		return cmd != nil
 	}
 
@@ -54,7 +54,7 @@ func (p *ParsedCommand) GetArgument(name string) *Value {
 		return nil
 	}
 
-	argumentValue := p.arguments[name]
+	argumentValue := p.Arguments[name]
 
 	return &Value{Value: argumentValue}
 }
@@ -63,25 +63,25 @@ func (p *ParsedCommand) GetOption(name string) *Value {
 	if !p.HasOption(name) {
 		return nil
 	}
-	optionValue := p.options[name]
+	optionValue := p.Options[name]
 
 	return &Value{Value: optionValue}
 }
 
 func (p *ParsedCommand) GetName() string {
-	return p.name
+	return p.Name
 }
 
 func (p *ParsedCommand) GetPrefix() string {
-	return p.prefix
+	return p.Prefix
 }
 
 func (p *ParsedCommand) GetSubCommand() string {
-	return p.subCommand
+	return p.SubCommand
 }
 
 func (p *ParsedCommand) GetOptionWithDefault(name string, defaultValue any) *Value {
-	optionValue := p.options[name]
+	optionValue := p.Options[name]
 	if optionValue == nil || optionValue == "" {
 		return &Value{Value: defaultValue}
 	}
@@ -89,7 +89,7 @@ func (p *ParsedCommand) GetOptionWithDefault(name string, defaultValue any) *Val
 }
 
 func (p *ParsedCommand) GetArgumentWithDefault(name string, defaultValue any) *Value {
-	argumentValue := p.arguments[name]
+	argumentValue := p.Arguments[name]
 	if argumentValue == nil || argumentValue == "" {
 		return &Value{Value: defaultValue}
 	}
@@ -119,12 +119,12 @@ func Parse(definition string, command string) *ParsedCommand {
 	}
 
 	return &ParsedCommand{
-		arguments:  arguments,
-		options:    options,
-		command:    command,
-		name:       name,
-		subCommand: subCommand,
-		prefix:     prefix,
+		Arguments:  arguments,
+		Options:    options,
+		Command:    command,
+		Name:       name,
+		SubCommand: subCommand,
+		Prefix:     prefix,
 	}
 }
 
@@ -172,10 +172,10 @@ func parseCommand(command string, options map[string]any, argumentsMap []string,
 
 	for index, item := range items {
 		if strings.HasPrefix(item, "--") {
-			optionName, optionValue := extractField(item, "--")
+			optionName, optionValue := ExtractField(item, "--")
 			options[optionName] = optionValue
 		} else if strings.HasPrefix(item, "-") {
-			optionName, optionValue := extractField(item, "-")
+			optionName, optionValue := ExtractField(item, "-")
 			options[optionName] = optionValue
 		} else {
 			if index > 0 && index < len(argumentsMap) {
@@ -186,7 +186,7 @@ func parseCommand(command string, options map[string]any, argumentsMap []string,
 	return items
 }
 
-func extractField(item string, prefix string) (string, any) {
+func ExtractField(item string, prefix string) (string, any) {
 	option := strings.TrimPrefix(item, prefix)
 	// extract option name and Value
 	parts := strings.Split(option, "=")
