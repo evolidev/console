@@ -203,7 +203,7 @@ func TestParseSimpleCommand(t *testing.T) {
 			},
 		}
 
-		assert.Equal(t, "mail:send", command.GetCommand())
+		assert.Equal(t, "send", command.GetCommand())
 		assert.Equal(t, "Send email", command.GetDescription())
 	})
 
