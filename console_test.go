@@ -137,6 +137,33 @@ func TestParseSimpleCommand(t *testing.T) {
 		assert.Equal(t, "", cmd.GetSubCommand())
 	})
 
+	t.Run("Get default value of option", func(t *testing.T) {
+		command := "mail"
+		definition := "mail:send {user} {--Q|queue}"
+
+		cmd := parse.Parse(definition, command)
+
+		assert.Equal(t, "default", cmd.GetOptionWithDefault("Q", "default").String())
+	})
+
+	t.Run("Get empty option", func(t *testing.T) {
+		command := "mail"
+		definition := "mail:send"
+
+		cmd := parse.Parse(definition, command)
+
+		assert.Nil(t, cmd.GetOption("Q"), "Option should be nil")
+	})
+
+	t.Run("Get empty argument", func(t *testing.T) {
+		command := "mail"
+		definition := "mail:send"
+
+		cmd := parse.Parse(definition, command)
+
+		assert.Nil(t, cmd.GetArgument("Q"), "Argument should be nil")
+	})
+
 	t.Run("Create simple command", func(t *testing.T) {
 		cli := New()
 		cli.AddCommand("mail:send {user}", "Send email", func(cmd *parse.ParsedCommand) {

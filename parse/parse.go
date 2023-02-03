@@ -33,21 +33,37 @@ func (o *Value) String() string {
 	return cast.ToString(o.Value)
 }
 
+func (p *ParsedCommand) HasOption(name string) bool {
+	if cmd, ok := p.options[name]; ok {
+		return cmd != nil
+	}
+
+	return false
+}
+
+func (p *ParsedCommand) HasArgument(name string) bool {
+	if cmd, ok := p.arguments[name]; ok {
+		return cmd != nil
+	}
+
+	return false
+}
+
 func (p *ParsedCommand) GetArgument(name string) *Value {
-	argumentValue := p.arguments[name]
-	if argumentValue == nil {
+	if !p.HasArgument(name) {
 		return nil
 	}
+
+	argumentValue := p.arguments[name]
 
 	return &Value{Value: argumentValue}
 }
 
 func (p *ParsedCommand) GetOption(name string) *Value {
-	optionValue := p.options[name]
-
-	if optionValue == nil {
+	if !p.HasOption(name) {
 		return nil
 	}
+	optionValue := p.options[name]
 
 	return &Value{Value: optionValue}
 }
