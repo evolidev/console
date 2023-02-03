@@ -3,6 +3,9 @@ package console
 import (
 	"github.com/evolidev/console/parse"
 	"github.com/stretchr/testify/assert"
+	"io"
+	"os"
+	"strings"
 	"testing"
 )
 
@@ -155,6 +158,21 @@ func TestParseSimpleCommand(t *testing.T) {
 		cli.Add(command)
 
 		cli.Call([]string{"mail:send"})
+	})
+
+	t.Run("Run non existing command", func(t *testing.T) {
+		cli := New()
+
+		r, w, _ := os.Pipe()
+		os.Stdout = w
+
+		cli.Call([]string{"mail:send", "foo"})
+
+		err := w.Close()
+		assert.Nil(t, err)
+		out, _ := io.ReadAll(r)
+
+		assert.True(t, strings.Contains(string(out), "Command not found"), "Expected 'Command not found' but got '%s'", string(out))
 	})
 
 }
