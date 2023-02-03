@@ -173,6 +173,15 @@ func TestParseSimpleCommand(t *testing.T) {
 		assert.Equal(t, "test", cmd.GetArgumentWithDefault("Q", "default").String())
 	})
 
+	t.Run("Get argument with default argument", func(t *testing.T) {
+		command := "mail"
+		definition := "mail:send {Q=test}"
+
+		cmd := parse.Parse(definition, command)
+
+		assert.Equal(t, "test", cmd.GetArgumentWithDefault("Q", "").String())
+	})
+
 	t.Run("Create simple command", func(t *testing.T) {
 		cli := New()
 		cli.AddCommand("mail:send {user}", "Send email", func(cmd *parse.ParsedCommand) {
