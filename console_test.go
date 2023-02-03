@@ -269,6 +269,7 @@ func TestParseSimpleCommand(t *testing.T) {
 
 		cli.AddCommand("mail:send {user}", "Send email", func(cmd *parse.ParsedCommand) {})
 		cli.AddCommand("queue:run", "Run queue", func(cmd *parse.ParsedCommand) {})
+		cli.AddCommand("queue:start", "Run queue", func(cmd *parse.ParsedCommand) {})
 
 		r, w, _ := os.Pipe()
 		os.Stdout = w
