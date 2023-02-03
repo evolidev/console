@@ -1,4 +1,5 @@
 [![Main](https://github.com/evolidev/console/actions/workflows/test.yml/badge.svg)](https://github.com/evolidev/console/actions/workflows/test.yml)
+[![codecov](https://codecov.io/github/evolidev/console/branch/dev/graph/badge.svg?token=6AGWZTOSKO)](https://codecov.io/github/evolidev/console)
 
 # evolidev/console
 
