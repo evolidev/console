@@ -2,8 +2,8 @@ package console
 
 import (
 	"fmt"
-    "github.com/evolidev/console/parse"
-    "os"
+	"github.com/evolidev/console/parse"
+	"os"
 	"sort"
 	"strings"
 
@@ -55,6 +55,10 @@ type Console struct {
 func (c *Console) Run() {
 	args := os.Args[1:]
 
+	c.Call(args)
+}
+
+func (c *Console) Call(args []string) {
 	if len(args) > 0 {
 		command := args[0]
 		if cmd, ok := c.Commands[command]; ok {
