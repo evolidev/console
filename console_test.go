@@ -194,4 +194,17 @@ func TestParseSimpleCommand(t *testing.T) {
 		assert.Contains(t, string(out), "Send email", "Expected 'Send email' but got '%s'", string(out))
 	})
 
+	t.Run("Create simple command with default value", func(t *testing.T) {
+		command := &Command{
+			Definition:  "mail:send {user=test}",
+			Description: "Send email",
+			Execution: func(cmd *parse.ParsedCommand) {
+				assert.Equal(t, "test", cmd.GetArgument("user").String())
+			},
+		}
+
+		assert.Equal(t, "mail:send", command.GetCommand())
+		assert.Equal(t, "Send email", command.GetDescription())
+	})
+
 }
