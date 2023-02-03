@@ -175,4 +175,23 @@ func TestParseSimpleCommand(t *testing.T) {
 		assert.True(t, strings.Contains(string(out), "Command not found"), "Expected 'Command not found' but got '%s'", string(out))
 	})
 
+	t.Run("Make sure command is rendered in stdout", func(t *testing.T) {
+		cli := New()
+
+		cli.AddCommand("mail:send {user}", "Send email", func(cmd *parse.ParsedCommand) {})
+
+		r, w, _ := os.Pipe()
+		os.Stdout = w
+
+		cli.Run()
+
+		err := w.Close()
+		assert.Nil(t, err)
+
+		out, _ := io.ReadAll(r)
+
+		assert.Contains(t, string(out), "mail:", "Expected 'mail:send' but got '%s'", string(out))
+		assert.Contains(t, string(out), "Send email", "Expected 'Send email' but got '%s'", string(out))
+	})
+
 }
