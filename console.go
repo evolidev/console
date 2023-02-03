@@ -37,10 +37,6 @@ func (cmd *Command) GetDescription() string {
 	return cmd.Description
 }
 
-func (cmd *Command) Run(c *parse.ParsedCommand) {
-	//return cmd.Name
-}
-
 type CommandGroup struct {
 	Name        string
 	Description string

@@ -243,4 +243,23 @@ func TestParseSimpleCommand(t *testing.T) {
 		assert.Equal(t, "Send email", command.GetDescription())
 	})
 
+	t.Run("Make sure command is rendered in stdout", func(t *testing.T) {
+		cli := New()
+
+		cli.AddCommand("mail:send {user}", "Send email", func(cmd *parse.ParsedCommand) {})
+		cli.AddCommand("queue:run", "Run queue", func(cmd *parse.ParsedCommand) {})
+
+		r, w, _ := os.Pipe()
+		os.Stdout = w
+
+		cli.Run()
+
+		err := w.Close()
+		assert.Nil(t, err)
+
+		out, _ := io.ReadAll(r)
+
+		assert.Contains(t, string(out), "queue:", "Expected 'mail:send' but got '%s'", string(out))
+	})
+
 }
