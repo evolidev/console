@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+var parseRegex = `[\-\\\/]{0,2}?((\w+)(?:[=:](\"[^\"]+\"|[^\s\"]+))?|((\/|\.\.?|)[^-\s][^"\s]*))(?:\s+|$)`
+
 type ParsedCommand struct {
 	Arguments  map[string]any
 	Options    map[string]any
@@ -95,8 +97,6 @@ func (p *ParsedCommand) GetArgumentWithDefault(name string, defaultValue any) *V
 	}
 	return &Value{Value: argumentValue}
 }
-
-var parseRegex = "[\\/-]{0,2}?((\\w+)(?:[=:](\"[^\"]+\"|[^\\s\"]+))?)(?:\\s+|$)"
 
 func Parse(definition string, command string) *ParsedCommand {
 	arguments := make(map[string]any)

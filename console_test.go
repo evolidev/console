@@ -217,6 +217,48 @@ func TestParseSimpleCommand(t *testing.T) {
 		cli.Call([]string{"mail:send"})
 	})
 
+	t.Run("Pass over a string with slashes as an argument (absolute path)", func(t *testing.T) {
+		cli := New()
+		command := &Command{
+			Definition:  "delete {path}",
+			Description: "Delete a file",
+			Execution: func(cmd *parse.ParsedCommand) {
+				assert.Equal(t, "/path/with/slashes/and/more", cmd.GetArgument("path").String())
+			},
+		}
+		cli.Add(command)
+
+		cli.Call([]string{"delete", "/path/with/slashes/and/more"})
+	})
+
+	t.Run("Pass over a string with slashes as an argument (relative path)", func(t *testing.T) {
+		cli := New()
+		command := &Command{
+			Definition:  "delete {path}",
+			Description: "Delete a file",
+			Execution: func(cmd *parse.ParsedCommand) {
+				assert.Equal(t, "to/with/slashes/and/more", cmd.GetArgument("path").String())
+			},
+		}
+		cli.Add(command)
+
+		cli.Call([]string{"delete", "to/with/slashes/and/more"})
+	})
+
+	t.Run("Pass over a string with slashes as an argument (relative path with dot)", func(t *testing.T) {
+		cli := New()
+		command := &Command{
+			Definition:  "delete {path}",
+			Description: "Delete a file",
+			Execution: func(cmd *parse.ParsedCommand) {
+				assert.Equal(t, "./to/with/slashes/and/more", cmd.GetArgument("path").String())
+			},
+		}
+		cli.Add(command)
+
+		cli.Call([]string{"delete", "./to/with/slashes/and/more"})
+	})
+
 	t.Run("Run non existing command", func(t *testing.T) {
 		cli := New()
 
