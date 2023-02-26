@@ -2,12 +2,13 @@ package console
 
 import (
 	"fmt"
-	"github.com/evolidev/console/parse"
+	"io"
 	"os"
 	"sort"
 	"strings"
 
 	"github.com/evolidev/console/color"
+	"github.com/evolidev/console/parse"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -46,6 +47,9 @@ type CommandGroup struct {
 
 type Console struct {
 	Commands map[string]*Command
+	Coloring bool
+	Output   io.Writer
+	Title    string
 }
 
 func (c *Console) Run() {
@@ -62,11 +66,17 @@ func (c *Console) Call(args []string) {
 			cmd.Execution(parsed)
 			return
 		} else {
-			fmt.Println(color.Text(140, "Command not found"))
+			fmt.Println()
+			fmt.Println(c.Bg(210, fmt.Sprintf("%46s", " ")))
+			fmt.Println(
+				c.Bg(210, c.Text(255, fmt.Sprintf("%s", "    Sorry, but the command does not exist.    "))),
+			)
+			fmt.Println(c.Bg(210, fmt.Sprintf("%46s", " ")))
+			fmt.Println()
 		}
 	}
 
-	Render(c.Commands)
+	c.Render()
 }
 
 func (c *Console) Add(command *Command) {
@@ -83,6 +93,8 @@ func (c *Console) AddCommand(name string, description string, execution func(c *
 func New() *Console {
 	return &Console{
 		Commands: make(map[string]*Command),
+		Coloring: true,
+		Output:   os.Stdout,
 	}
 }
 
@@ -125,16 +137,27 @@ func groupCommands(commands map[string]*Command) []CommandGroup {
 	return groupedCommands
 }
 
-func Render(commands map[string]*Command) {
-	table := setupTable()
+func (c *Console) Render() {
+	table := c.SetupTable()
 
-	addCommandsToTable(commands, table)
+	c.AddCommandsToTable(table)
+
+	if c.Title != "" {
+		fmt.Println()
+		fmt.Println(c.Title)
+		fmt.Println()
+	}
+
+	fmt.Println(c.Text(249, "USAGE:"))
+	fmt.Printf("   command [options] [arguments]")
+	fmt.Println()
+	fmt.Println()
 
 	table.Render()
 }
 
-func addCommandsToTable(commands map[string]*Command, table *tablewriter.Table) {
-	groupedCommands := groupCommands(commands)
+func (c *Console) AddCommandsToTable(table *tablewriter.Table) {
+	groupedCommands := groupCommands(c.Commands)
 	for _, group := range groupedCommands {
 		prefix := ""
 		if group.Name != "" {
@@ -143,13 +166,13 @@ func addCommandsToTable(commands map[string]*Command, table *tablewriter.Table) 
 				{},
 			})
 
-			prefix = color.Text(140, group.Prefix+":")
+			prefix = c.Text(140, group.Prefix+":")
 		}
 
 		for _, cmd := range group.Commands {
 			table.Append([]string{
-				prefix + color.Text(169, cmd.GetCommand()),
-				color.Text(245, cmd.Description),
+				prefix + c.Text(169, "  "+cmd.GetCommand()),
+				c.Text(245, cmd.Description),
 			})
 		}
 
@@ -157,9 +180,9 @@ func addCommandsToTable(commands map[string]*Command, table *tablewriter.Table) 
 	}
 }
 
-func setupTable() *tablewriter.Table {
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Available Commands", ""})
+func (c *Console) SetupTable() *tablewriter.Table {
+	table := tablewriter.NewWriter(c.Output)
+	table.SetHeader([]string{"AVAILABLE COMMANDS", ""})
 	table.SetAutoWrapText(false)
 	table.SetAutoFormatHeaders(true)
 	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
@@ -172,14 +195,49 @@ func setupTable() *tablewriter.Table {
 	table.SetTablePadding("\t") // pad with tabs
 	table.SetNoWhiteSpace(true)
 
-	table.SetColumnColor(
-		tablewriter.Colors{tablewriter.FgHiMagentaColor},
-		tablewriter.Colors{tablewriter.FgHiBlackColor},
-	)
+	if c.Coloring {
+		table.SetColumnColor(
+			tablewriter.Colors{tablewriter.FgHiMagentaColor},
+			tablewriter.Colors{tablewriter.FgHiBlackColor},
+		)
 
-	table.SetHeaderColor(
-		tablewriter.Colors{tablewriter.FgHiWhiteColor},
-		tablewriter.Colors{tablewriter.FgHiBlackColor},
-	)
+		table.SetHeaderColor(
+			tablewriter.Colors{tablewriter.FgHiWhiteColor},
+			tablewriter.Colors{tablewriter.FgHiBlackColor},
+		)
+	}
+
 	return table
+}
+
+func (c *Console) DisableColors() {
+	c.Coloring = false
+}
+
+func (c *Console) EnableColors() {
+	c.Coloring = true
+}
+
+func (c *Console) SetOutput(output io.Writer) {
+	c.Output = output
+}
+
+func (c *Console) Text(code int, value interface{}) string {
+	if c.Coloring {
+		return color.Text(code, value)
+	}
+
+	return fmt.Sprintf("%v", value)
+}
+
+func (c *Console) Bg(code int, value interface{}) string {
+	if c.Coloring {
+		return color.Bg(code, value)
+	}
+
+	return fmt.Sprintf("%v", value)
+}
+
+func (c *Console) SetTitle(title string) {
+	c.Title = title
 }
