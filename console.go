@@ -59,20 +59,24 @@ func (c *Console) Run() {
 }
 
 func (c *Console) Call(args []string) {
+
+	args = cleanArgs(args)
 	if len(args) > 0 {
 		command := args[0]
+		arguments := strings.Join(args, " ")
+
 		if cmd, ok := c.Commands[command]; ok {
-			parsed := parse.Parse(cmd.Definition, strings.Join(args, " "))
+			parsed := parse.Parse(cmd.Definition, arguments)
 			cmd.Execution(parsed)
 			return
 		} else {
-			fmt.Println()
-			fmt.Println(c.Bg(210, fmt.Sprintf("%46s", " ")))
-			fmt.Println(
-				c.Bg(210, c.Text(255, fmt.Sprintf("%s", "    Sorry, but the command does not exist.    "))),
+			c.Println()
+			c.Println(c.Bg(210, fmt.Sprintf("%46s", " ")))
+			c.Println(
+				c.Bg(210, c.Text(255, fmt.Sprintf("%s", "    Sorry, but the command does not exist:    "))),
 			)
-			fmt.Println(c.Bg(210, fmt.Sprintf("%46s", " ")))
-			fmt.Println()
+			c.Println(c.Bg(210, fmt.Sprintf("%46s", " ")))
+			c.Println()
 		}
 	}
 
@@ -143,15 +147,14 @@ func (c *Console) Render() {
 	c.AddCommandsToTable(table)
 
 	if c.Title != "" {
-		fmt.Println()
-		fmt.Println(c.Title)
-		fmt.Println()
+		c.Println()
+		c.Println(c.Title)
+		c.Println()
 	}
 
-	fmt.Println(c.Text(249, "USAGE:"))
-	fmt.Printf("   command [options] [arguments]")
-	fmt.Println()
-	fmt.Println()
+	c.Println(c.Text(249, "USAGE:"))
+	c.Println("   command [options] [arguments]")
+	c.Println()
 
 	table.Render()
 }
@@ -240,4 +243,23 @@ func (c *Console) Bg(code int, value interface{}) string {
 
 func (c *Console) SetTitle(title string) {
 	c.Title = title
+}
+
+func cleanArgs(args []string) []string {
+	var cleaned []string
+	for _, arg := range args {
+		// filter out -test. arguments
+		if arg != "" && !strings.HasPrefix(arg, "-test.") {
+			cleaned = append(cleaned, arg)
+		}
+	}
+
+	return cleaned
+}
+
+func (c *Console) Println(args ...interface{}) {
+	_, err := fmt.Fprintln(c.Output, args...)
+	if err != nil {
+		panic(err)
+	}
 }
