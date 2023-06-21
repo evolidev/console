@@ -174,7 +174,7 @@ func (c *Console) AddCommandsToTable(table *tablewriter.Table) {
 
 		for _, cmd := range group.Commands {
 			table.Append([]string{
-				prefix + c.Text(169, "  "+cmd.GetCommand()),
+				prefix + c.Text(169, ""+cmd.GetCommand()),
 				c.Text(245, cmd.Description),
 			})
 		}
